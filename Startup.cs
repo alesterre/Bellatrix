@@ -1,3 +1,5 @@
+using bellatrix.Model;
+using bellatrix.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +7,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace bellatrix
 {
@@ -20,6 +23,13 @@ namespace bellatrix
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<BellatrixDatabaseSettings>(
+                Configuration.GetSection(nameof(BellatrixDatabaseSettings)));
+
+            services.AddSingleton<IBellatrixDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<BellatrixDatabaseSettings>>().Value);
+
+            services.AddSingleton<MongoDbService>();
 
             services.AddControllersWithViews();
 

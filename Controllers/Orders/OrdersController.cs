@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using bellatrix.Model;
+using bellatrix.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -13,34 +14,20 @@ namespace bellatrix.Controllers.Orders
     public class OrdersController : ControllerBase
     {
         private readonly ILogger<OrdersController> _logger;
+        private readonly MongoDbService _service;
 
-        public OrdersController(ILogger<OrdersController> logger)
+        public OrdersController(
+            ILogger<OrdersController> logger,
+            MongoDbService service)
         {
             _logger = logger;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<IEnumerable<Order>> GetAll()
         {
-            return new List<Order>
-            {
-                new Order
-                {
-                    Id = Guid.NewGuid(),
-                    DateCreated = DateTime.Now,
-                    ClientName = "Doggo Inc.",
-                    Description = "Dog food",
-                    TotalPrice = (decimal) 500.55
-                },
-                new Order
-                {
-                    Id = Guid.NewGuid(),
-                    DateCreated = DateTime.Now,
-                    ClientName = "Musical Service",
-                    Description = "Piano spare parts",
-                    TotalPrice = (decimal) 1500.00
-                }
-            };
+            return await _service.Get();
         }
 
         [HttpPost]
