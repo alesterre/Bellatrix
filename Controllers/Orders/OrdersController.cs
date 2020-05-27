@@ -27,31 +27,27 @@ namespace bellatrix.Controllers.Orders
         [HttpGet]
         public async Task<IEnumerable<Order>> GetAll()
         {
-            return await _service.Get();
+            return await _service.GetAsync();
         }
 
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Order order)
         {
-            _logger.LogInformation(order.ToString());
-
+            await _service.CreateAsync(order);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(Guid id, [FromBody] Order order)
+        public async Task<ActionResult> Update(string id, [FromBody] Order order)
         {
-            _logger.LogInformation(id.ToString());
-            _logger.LogInformation(order.ToString());
-
+            await _service.UpdateAsync(id, order);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(Guid id)
+        public async Task<ActionResult> Delete(string id)
         {
-            _logger.LogInformation(id.ToString());
-
+            await _service.RemoveAsync(id);
             return Ok();
         }
     }

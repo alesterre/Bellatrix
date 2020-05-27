@@ -19,25 +19,25 @@ namespace bellatrix.Services
             _orders = database.GetCollection<Order>(settings.OrdersCollectionName);
         }
 
-        public async Task<List<Order>> Get() =>
+        public async Task<List<Order>> GetAsync() =>
             await _orders.Find(order => true).ToListAsync();
 
         public Order Get(string id) =>
             _orders.Find<Order>(order => order.Id == id).FirstOrDefault();
 
-        public Order Create(Order order)
+        public async Task CreateAsync(Order order)
         {
-            _orders.InsertOne(order);
-            return order;
+            await _orders.InsertOneAsync(order);
         }
 
-        public void Update(string id, Order orderIn) =>
-            _orders.ReplaceOne(order => order.Id == id, orderIn);
+        public async Task UpdateAsync(string id, Order orderIn)
+        {
+            await _orders.ReplaceOneAsync(order => order.Id == id, orderIn);
+        }
 
-        public void Remove(Order orderIn) =>
-            _orders.DeleteOne(order => order.Id == orderIn.Id);
-
-        public void Remove(string id) =>
-            _orders.DeleteOne(order => order.Id == id);
+        public async Task RemoveAsync(string id)
+        {
+            await _orders.DeleteOneAsync(order => order.Id == id);
+        }
     }
 }

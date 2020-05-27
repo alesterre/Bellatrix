@@ -1,7 +1,20 @@
 import Axios from "axios";
+import Order from '../Model/Order'
 
 export default class OrdersApi {
-  public getAll () {
+  public static getAll () {
     return Axios.get('/api/orders');
+  }
+
+  public static createOrder (newOrder: Order) {
+    return Axios.post<Order>('/api/orders', newOrder)
+  }
+
+  public static updateOrder (updatedOrder: Order) {
+    return Axios.put(`/api/orders/${updatedOrder.id}`, updatedOrder)
+  }
+
+  public static deleteOrder (orderId: string) {
+    return Axios.delete(`/api/orders/${orderId}`)
   }
 }
