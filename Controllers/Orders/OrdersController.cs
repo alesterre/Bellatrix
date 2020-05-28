@@ -33,6 +33,7 @@ namespace bellatrix.Controllers.Orders
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Order order)
         {
+            order.DateCreated = DateTime.UtcNow;
             await _service.CreateAsync(order);
             return Ok();
         }
@@ -40,6 +41,13 @@ namespace bellatrix.Controllers.Orders
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(string id, [FromBody] Order order)
         {
+            var orderToUpdate = await _service.GetAsync(id);
+
+            if (orderToUpdate == null)
+            {
+                return NotFound();
+            }
+
             await _service.UpdateAsync(id, order);
             return Ok();
         }
@@ -47,6 +55,13 @@ namespace bellatrix.Controllers.Orders
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
+            var orderToDelete = await _service.GetAsync(id);
+
+            if (orderToDelete == null)
+            {
+                return NotFound();
+            }
+
             await _service.RemoveAsync(id);
             return Ok();
         }

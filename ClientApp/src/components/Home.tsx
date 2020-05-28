@@ -169,7 +169,6 @@ export class Home extends Component<IProps, OrdersState> {
   }
 
   async submitOrder() {
-    // todo: take care of DateCreated
     const submittedOrder = new Order('', new Date(), this.state.currentOrderClientName,
       this.state.currentOrderDescription, this.state.currentOrderTotalPrice);
     if (this.state.modalAction === 'Create') {

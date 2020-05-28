@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using bellatrix.Model;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace bellatrix.Services
@@ -22,8 +23,8 @@ namespace bellatrix.Services
         public async Task<List<Order>> GetAsync() =>
             await _orders.Find(order => true).ToListAsync();
 
-        public Order Get(string id) =>
-            _orders.Find<Order>(order => order.Id == id).FirstOrDefault();
+        public async Task<Order> GetAsync(string id) =>
+            await _orders.Find<Order>(order => order.Id == id).FirstOrDefaultAsync();
 
         public async Task CreateAsync(Order order)
         {
@@ -32,7 +33,15 @@ namespace bellatrix.Services
 
         public async Task UpdateAsync(string id, Order orderIn)
         {
-            await _orders.ReplaceOneAsync(order => order.Id == id, orderIn);
+            var updateBsonDoc = new BsonDocument
+            {
+                {"ClientName", orderIn.ClientName},
+                {"Description", orderIn.Description},
+                {"TotalPrice", orderIn.TotalPrice}
+            };
+
+            await _orders.UpdateOneAsync(order => order.Id == id,
+                new BsonDocument("$set", updateBsonDoc));
         }
 
         public async Task RemoveAsync(string id)
