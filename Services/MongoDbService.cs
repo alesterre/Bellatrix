@@ -23,6 +23,24 @@ namespace bellatrix.Services
         public async Task<List<Order>> GetAsync() =>
             await _orders.Find(order => true).ToListAsync();
 
+        public async Task<List<Order>> SearchAsync(string searchParam)
+        {
+            var filter = new BsonDocument
+            {
+                {
+                    "ClientName", 
+                    new BsonDocument 
+                    { 
+                        {"$regex", searchParam ?? ""}, {"$options", "i"}
+                    }
+                }
+            };
+
+            return await _orders
+                .Find(filter)
+                .ToListAsync();
+        }
+
         public async Task<Order> GetAsync(string id) =>
             await _orders.Find<Order>(order => order.Id == id).FirstOrDefaultAsync();
 

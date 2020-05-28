@@ -30,6 +30,12 @@ namespace bellatrix.Controllers.Orders
             return await _service.GetAsync();
         }
 
+        [HttpGet("search")]
+        public async Task<IEnumerable<Order>> Search([FromQuery]string searchParam)
+        {
+            return await _service.SearchAsync(searchParam);
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Order order)
         {

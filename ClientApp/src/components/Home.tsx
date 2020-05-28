@@ -8,6 +8,7 @@ import { booleanLiteral } from '@babel/types';
 
 type OrdersState = {
   orders: Order[],
+  searchParam: string,
   modal: boolean,
   modalAction: 'Create' | 'Update',
   toggle: boolean,
@@ -27,6 +28,7 @@ export class Home extends Component<IProps, OrdersState> {
     super(props);
     this.state = {
       orders: new Array<Order>(),
+      searchParam: "",
       modal: false,
       modalAction: 'Create',
       toggle: false,
@@ -35,6 +37,9 @@ export class Home extends Component<IProps, OrdersState> {
       currentOrderClientName: "",
       currentOrderTotalPrice: 0
      };
+  }
+  handleSearchParamChange(event: any) {
+    this.setState({searchParam: event.target.value});
   }
 
   handleDescriptionChange(event: any) {
@@ -57,6 +62,18 @@ export class Home extends Component<IProps, OrdersState> {
     return (
       <div>
         <h1>Orders</h1>
+        <Row>
+          <Col>
+            <InputGroup>
+              <Input id="search"
+                     value={this.state.searchParam}
+                     onChange={(e) => this.handleSearchParamChange(e)} />
+              <InputGroupAddon addonType="append">
+                <Button onClick={this.onSearch} color="secondary">Search</Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </Col>
+        </Row>
         <Table>
           <thead>
             <tr>
@@ -72,7 +89,7 @@ export class Home extends Component<IProps, OrdersState> {
               <tr key={o.id}>
                 <td> {o.dateCreatedFormat()}</td>
                 <td> {o.clientName}</td>
-                <td> {o.totalPrice}</td>
+                <td align="right"> {o.totalPrice}</td>
                 <td> {o.description}</td>
                 <td>
                   <ButtonGroup>
@@ -147,6 +164,10 @@ export class Home extends Component<IProps, OrdersState> {
     })
   };
 
+  onSearch = async () => {
+    await this.reloadOrders();
+  }
+
   onEditItem = (order: Order) => {
     this.setState(() => {
       return {
@@ -166,7 +187,7 @@ export class Home extends Component<IProps, OrdersState> {
   }
 
   async reloadOrders() {
-    const allOrders = (await OrdersApi.getAll()).data.map((apiOrder: any) => {
+    const allOrders = (await OrdersApi.search(this.state.searchParam)).data.map((apiOrder: any) => {
       return new Order(apiOrder.id, apiOrder.dateCreated, apiOrder.clientName, apiOrder.description, apiOrder.totalPrice)
     } );
 

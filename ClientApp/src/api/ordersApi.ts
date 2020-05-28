@@ -6,6 +6,12 @@ export default class OrdersApi {
     return Axios.get('/api/orders');
   }
 
+  public static search (searchParam: string) {
+    return Axios.get('/api/orders/search', { params: {
+      searchParam
+    }});
+  }
+
   public static createOrder (newOrder: Order) {
     return Axios.post<Order>('/api/orders', newOrder)
   }
