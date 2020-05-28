@@ -60,14 +60,20 @@ export class Home extends Component<IProps, OrdersState> {
         <Table>
           <thead>
             <tr>
-              <th>Order</th>
-              <th>Actions</th>
+              <th>Created at</th>
+              <th>Client name</th>
+              <th>Total price</th>
+              <th>Description</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {this.state.orders.map((o) =>
               <tr key={o.id}>
-                <td> {o.toString()}</td>
+                <td> {o.dateCreatedFormat()}</td>
+                <td> {o.clientName}</td>
+                <td> {o.totalPrice}</td>
+                <td> {o.description}</td>
                 <td>
                   <ButtonGroup>
                     <Button onClick={() => this.onEditItem(o)}>Edit</Button>
@@ -90,13 +96,13 @@ export class Home extends Component<IProps, OrdersState> {
             <Container>
               <Row md="2">
                 <Col>
-                  <Label for="clientName" sm={2}>Client name</Label>
+                  <Label for="clientName">Client name</Label>
                   <Input id="clientName"
                          value={this.state.currentOrderClientName}
                          onChange={(e) => this.handleClientNameChange(e)} />
                 </Col>
                 <Col>
-                  <Label for="totalPrice" sm={2}>Total price</Label>
+                  <Label for="totalPrice">Total price</Label>
                   <InputGroup>
                     <InputGroupAddon addonType="prepend">$</InputGroupAddon>
                     <Input id="totalPrice" placeholder="Total price" type="number"
@@ -106,10 +112,12 @@ export class Home extends Component<IProps, OrdersState> {
                 </Col>
               </Row>
               <Row>
-                <Label for="description" sm={2}>Description</Label>
-                <Input type="textarea" id="description"
-                       value={this.state.currentOrderDescription}
-                       onChange={(e) => this.handleDescriptionChange(e)} />
+                <Col>
+                  <Label for="description">Description</Label>
+                  <Input type="textarea" id="description"
+                         value={this.state.currentOrderDescription}
+                         onChange={(e) => this.handleDescriptionChange(e)} />
+                </Col>
               </Row>
             </Container>
           </ModalBody>
