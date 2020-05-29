@@ -16,3 +16,7 @@ code {
 .container .row {
   margin-bottom: 1rem;
 }
+
+.btn-row .btn {
+  margin-right: 0.5rem;
+}

@@ -24,4 +24,12 @@ export default class OrdersApi {
   public static deleteOrder (orderId: string) {
     return Axios.delete(`/api/orders/${orderId}`)
   }
+
+  public static create10kOrders () {
+    return Axios.post('/api/orders/10k')
+  }
+
+  public static deleteAllOrders () {
+    return Axios.delete(`/api/orders/all`)
+  }
 }

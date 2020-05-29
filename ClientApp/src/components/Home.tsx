@@ -72,6 +72,10 @@ export class Home extends Component<IProps, OrdersState> {
     this.setState({currentPage: page}, async () => await this.reloadOrders())
   }
 
+  async handlePageNofMClick(event: any) {
+    event.preventDefault();
+  }
+
   handlePreviousClick(event: any) {
     event.preventDefault();
     this.setState((state) => { return {currentPage: state.currentPage - 1}},
@@ -109,6 +113,7 @@ export class Home extends Component<IProps, OrdersState> {
         <Row>Only showing orders with client name containing "{this.state.latestUsedSearchParam}"</Row>
         }
         <Row>
+        { this.state.orders.length > 0 &&
         <Table>
           <thead>
             <tr>
@@ -122,9 +127,9 @@ export class Home extends Component<IProps, OrdersState> {
           <tbody>
             {this.state.orders.map((o) =>
               <tr key={o.id}>
-                <td> {o.dateCreatedFormat()}</td>
+                <td> {o.dateCreatedFormatted()}</td>
                 <td> {o.clientName}</td>
-                <td align="right"> {o.totalPrice}</td>
+                <td align="right"> {o.totalPriceFormatted()}</td>
                 <td> {o.description}</td>
                 <td>
                   <ButtonGroup>
@@ -136,11 +141,16 @@ export class Home extends Component<IProps, OrdersState> {
             )}
           </tbody>
         </Table>
+        }
+        { this.state.orders.length === 0 &&
+        <p>No orders</p>
+        }
         </Row>
+        { this.state.pagesCount > 1 &&
         <Row>
           <Pagination>
             <PaginationItem disabled={this.state.currentPage <= 0}>
-              <PaginationLink onClick={(e) => this.handlePageClick(e, 0)} first href="#" >
+              <PaginationLink onClick={(e) => this.handlePageClick(e, 0)} href="#" >
                 «
               </PaginationLink>
             </PaginationItem>
@@ -149,29 +159,43 @@ export class Home extends Component<IProps, OrdersState> {
                 ‹
               </PaginationLink>
             </PaginationItem>
-            {[...Array(this.state.pagesCount)].map((page, i) => (
+            { this.state.pagesCount <= 10 && [...Array(this.state.pagesCount)].map((page, i) => (
             <PaginationItem active={i === this.state.currentPage} key={i}>
               <PaginationLink onClick={async (e) => await this.handlePageClick(e, i)} href="#">
                 {i + 1}
               </PaginationLink>
             </PaginationItem>
             ))}
+            { this.state.pagesCount > 10 &&
+            <PaginationItem>
+              <PaginationLink onClick={async (e) => await this.handlePageNofMClick(e)}>
+                Page {this.state.currentPage + 1} of {this.state.pagesCount}
+              </PaginationLink>
+            </PaginationItem>
+            }
             <PaginationItem disabled={this.state.currentPage >= this.state.pagesCount - 1}>
               <PaginationLink onClick={(e) => this.handleNextClick(e)} next href="#">
                 ›
               </PaginationLink>
             </PaginationItem>
             <PaginationItem disabled={this.state.currentPage >= this.state.pagesCount - 1}>
-              <PaginationLink onClick={(e) => this.handlePageClick(e, this.state.pagesCount - 1)} last href="#">
+              <PaginationLink onClick={(e) => this.handlePageClick(e, this.state.pagesCount - 1)} href="#">
                 »
               </PaginationLink>
             </PaginationItem>
           </Pagination>
         </Row>
-        <Row>
+        }
+        <Row className="btn-row">
           <Button
-            type="button"
+            color="primary"
             onClick={this.onAddItem}>Add new order</Button>
+          <Button
+            color="secondary"
+            onClick={this.onAdd10kOrders}>Generate 10k orders</Button>
+          <Button
+            color="danger"
+            onClick={this.onDeleteAllOrders}>Delete all orders</Button>
         </Row>
         <Modal isOpen={this.state.modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>{this.state.modalAction} order</ModalHeader>
@@ -229,6 +253,16 @@ export class Home extends Component<IProps, OrdersState> {
       }
     })
   };
+
+  onAdd10kOrders = async () => {
+    await OrdersApi.create10kOrders();
+    await this.reloadOrders();
+  }
+
+  onDeleteAllOrders = async () => {
+    await OrdersApi.deleteAllOrders();
+    this.setState(() => { return { currentPage: 0}}, async () => await this.reloadOrders())
+  }
 
   onSearch = async () => {
     this.setState({ currentPage: 0 }, async () => await this.reloadOrders())

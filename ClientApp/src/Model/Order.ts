@@ -19,11 +19,15 @@ export default class Order {
     this.totalPrice = totalPrice;
   }
 
-  dateCreatedFormat () : string {
+  dateCreatedFormatted () : string {
     return moment(this.dateCreated).local().format('YYYY-MM-DD HH:mm:ss');
   }
 
+  totalPriceFormatted () : string {
+    return `$${this.totalPrice}`;
+  }
+
   toString() {
-    return `${this.id} - ${this.dateCreatedFormat()} - ${this.clientName} - ${this.description}: $${this.totalPrice}`
+    return `${this.id} - ${this.dateCreatedFormatted()} - ${this.clientName} - ${this.description}: $${this.totalPrice}`
   }
 }

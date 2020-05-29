@@ -82,5 +82,19 @@ namespace bellatrix.Services
         {
             await _orders.DeleteOneAsync(order => order.Id == id);
         }
+
+        public async Task RemoveAllAsync()
+        {
+            await _orders.DeleteManyAsync(order => true);
+        }
+
+        public async Task Create10KAsync()
+        {
+            var randomOrders = Enumerable.Range(0, 10_000)
+                .ToList()
+                .Select(i => RandomOrderGenerator.GenerateRandomOrder());
+            
+            await _orders.InsertManyAsync(randomOrders);
+        }
     }
 }

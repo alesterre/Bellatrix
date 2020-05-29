@@ -74,6 +74,20 @@ namespace bellatrix.Controllers.Orders
             return Ok();
         }
 
+        [HttpPost("10k")]
+        public async Task<ActionResult> Create10K()
+        {
+            await _service.Create10KAsync();
+            return Ok();
+        }
+
+        [HttpDelete("all")]
+        public async Task<ActionResult> DeleteAll()
+        {
+            await _service.RemoveAllAsync();
+            return Ok();
+        }
+
         public class OrdersResponse
         {
             public IList<Order> Orders { get; set; }
