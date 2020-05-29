@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using bellatrix.Model;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -14,12 +15,17 @@ namespace bellatrix.Services
 
         private const int PageSize = 10;
 
-        public MongoDbService(IBellatrixDatabaseSettings settings)
+        public MongoDbService(IBellatrixDatabaseSettings settings, ILogger<MongoDbService> logger)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
             _orders = database.GetCollection<Order>(settings.OrdersCollectionName);
+
+            _orders.Indexes.CreateOne(
+                new CreateIndexModel<Order>(
+                    new BsonDocumentIndexKeysDefinition<Order>(
+                        new BsonDocument("DateCreated", -1)), new CreateIndexOptions { Name = "DateCreatedIndex" }));
         }
 
         public async Task<List<Order>> GetAsync() =>
