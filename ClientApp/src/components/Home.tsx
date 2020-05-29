@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Container, Row, Col,
-         Label, Input, InputGroup, InputGroupAddon, Table, ButtonGroup  } from 'reactstrap';
+         Label, Input, InputGroup, InputGroupAddon, Table, ButtonGroup,
+         Pagination, PaginationItem, PaginationLink  } from 'reactstrap';
 import { Component } from 'react';
 import Order from '../Model/Order'
 import OrdersApi from '../api/ordersApi'
-import { booleanLiteral } from '@babel/types';
 
 type OrdersState = {
   orders: Order[],
   searchParam: string,
+  latestUsedSearchParam: string,
+  pagesCount: number,
+  currentPage: number,
   modal: boolean,
   modalAction: 'Create' | 'Update',
   toggle: boolean,
@@ -29,6 +32,9 @@ export class Home extends Component<IProps, OrdersState> {
     this.state = {
       orders: new Array<Order>(),
       searchParam: "",
+      latestUsedSearchParam: "",
+      pagesCount: 1,
+      currentPage: 0,
       modal: false,
       modalAction: 'Create',
       toggle: false,
@@ -38,6 +44,13 @@ export class Home extends Component<IProps, OrdersState> {
       currentOrderTotalPrice: 0
      };
   }
+
+  async searchInputKeyPress(event: any) {
+    if (event.keyCode === 13) {
+      await this.onSearch()
+    }
+  }
+
   handleSearchParamChange(event: any) {
     this.setState({searchParam: event.target.value});
   }
@@ -54,6 +67,23 @@ export class Home extends Component<IProps, OrdersState> {
     this.setState({currentOrderTotalPrice: +event.target.value});
   }
 
+  async handlePageClick(event: any, page: number) {
+    event.preventDefault();
+    this.setState({currentPage: page}, async () => await this.reloadOrders())
+  }
+
+  handlePreviousClick(event: any) {
+    event.preventDefault();
+    this.setState((state) => { return {currentPage: state.currentPage - 1}},
+      async () => await this.reloadOrders());
+  }
+  handleNextClick(event: any) {
+    event.preventDefault();
+    this.setState((state) => { return {currentPage: state.currentPage + 1}},
+      async () => await this.reloadOrders());
+  }
+
+
   render () {
     const toggle = () => {
        this.setState(state => { return { modal: !state.modal} })
@@ -67,13 +97,18 @@ export class Home extends Component<IProps, OrdersState> {
             <InputGroup>
               <Input id="search"
                      value={this.state.searchParam}
+                     onKeyDown={async (e) => await this.searchInputKeyPress(e)}
                      onChange={(e) => this.handleSearchParamChange(e)} />
               <InputGroupAddon addonType="append">
-                <Button onClick={this.onSearch} color="secondary">Search</Button>
+                <Button onClick={this.onSearch} color="primary">Search</Button>
               </InputGroupAddon>
             </InputGroup>
           </Col>
         </Row>
+        { this.state.latestUsedSearchParam.length > 0 &&
+        <Row>Only showing orders with client name containing "{this.state.latestUsedSearchParam}"</Row>
+        }
+        <Row>
         <Table>
           <thead>
             <tr>
@@ -101,12 +136,43 @@ export class Home extends Component<IProps, OrdersState> {
             )}
           </tbody>
         </Table>
-        <Button
-          type="button"
-          onClick={this.onAddItem}
-        >
-          Add new order
-        </Button>
+        </Row>
+        <Row>
+          <Pagination>
+            <PaginationItem disabled={this.state.currentPage <= 0}>
+              <PaginationLink onClick={(e) => this.handlePageClick(e, 0)} first href="#" >
+                «
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem disabled={this.state.currentPage <= 0}>
+              <PaginationLink onClick={(e) => this.handlePreviousClick(e)} previous href="#">
+                ‹
+              </PaginationLink>
+            </PaginationItem>
+            {[...Array(this.state.pagesCount)].map((page, i) => (
+            <PaginationItem active={i === this.state.currentPage} key={i}>
+              <PaginationLink onClick={async (e) => await this.handlePageClick(e, i)} href="#">
+                {i + 1}
+              </PaginationLink>
+            </PaginationItem>
+            ))}
+            <PaginationItem disabled={this.state.currentPage >= this.state.pagesCount - 1}>
+              <PaginationLink onClick={(e) => this.handleNextClick(e)} next href="#">
+                ›
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem disabled={this.state.currentPage >= this.state.pagesCount - 1}>
+              <PaginationLink onClick={(e) => this.handlePageClick(e, this.state.pagesCount - 1)} last href="#">
+                »
+              </PaginationLink>
+            </PaginationItem>
+          </Pagination>
+        </Row>
+        <Row>
+          <Button
+            type="button"
+            onClick={this.onAddItem}>Add new order</Button>
+        </Row>
         <Modal isOpen={this.state.modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>{this.state.modalAction} order</ModalHeader>
           <ModalBody>
@@ -165,7 +231,7 @@ export class Home extends Component<IProps, OrdersState> {
   };
 
   onSearch = async () => {
-    await this.reloadOrders();
+    this.setState({ currentPage: 0 }, async () => await this.reloadOrders())
   }
 
   onEditItem = (order: Order) => {
@@ -182,18 +248,30 @@ export class Home extends Component<IProps, OrdersState> {
   }
 
   onDeleteItem = async (order: Order) => {
+    const deletingLastOrderOnPage = this.state.currentPage > 0 && this.state.orders.length === 1
+
     await OrdersApi.deleteOrder(order.id);
-    await this.reloadOrders();
+
+    if (deletingLastOrderOnPage) {
+      this.setState((state) => { return { currentPage: state.currentPage - 1}}, async () => await this.reloadOrders())
+    } else {
+      await this.reloadOrders();
+    }
   }
 
   async reloadOrders() {
-    const allOrders = (await OrdersApi.search(this.state.searchParam)).data.map((apiOrder: any) => {
+    let ordersResponse = (await OrdersApi.search(this.state.searchParam, this.state.currentPage)).data
+    const filteredOrders = ordersResponse.orders.map((apiOrder: any) => {
       return new Order(apiOrder.id, apiOrder.dateCreated, apiOrder.clientName, apiOrder.description, apiOrder.totalPrice)
     } );
 
     this.setState(() => {
-      const orders = allOrders
-      return { orders }
+      const orders = filteredOrders
+      return {
+        orders,
+        pagesCount: ordersResponse.pagesCount,
+        latestUsedSearchParam: this.state.searchParam
+      }
     })
   }
 

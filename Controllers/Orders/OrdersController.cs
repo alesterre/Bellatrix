@@ -31,9 +31,11 @@ namespace bellatrix.Controllers.Orders
         }
 
         [HttpGet("search")]
-        public async Task<IEnumerable<Order>> Search([FromQuery]string searchParam)
+        public async Task<OrdersResponse> Search([FromQuery] string searchParam, [FromQuery] int page)
         {
-            return await _service.SearchAsync(searchParam);
+            var (orders, pagesCount) = await _service.SearchAsync(searchParam, page);
+
+            return new OrdersResponse {Orders = orders, PagesCount = pagesCount};
         }
 
         [HttpPost]
@@ -70,6 +72,12 @@ namespace bellatrix.Controllers.Orders
 
             await _service.RemoveAsync(id);
             return Ok();
+        }
+
+        public class OrdersResponse
+        {
+            public IList<Order> Orders { get; set; }
+            public long PagesCount { get; set; }
         }
     }
 }

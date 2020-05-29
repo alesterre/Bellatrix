@@ -6,9 +6,10 @@ export default class OrdersApi {
     return Axios.get('/api/orders');
   }
 
-  public static search (searchParam: string) {
+  public static search (searchParam: string, page: number) {
     return Axios.get('/api/orders/search', { params: {
-      searchParam
+      searchParam,
+      page
     }});
   }
 

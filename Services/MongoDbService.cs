@@ -12,6 +12,8 @@ namespace bellatrix.Services
     {
         private readonly IMongoCollection<Order> _orders;
 
+        private const int PageSize = 10;
+
         public MongoDbService(IBellatrixDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
@@ -23,7 +25,7 @@ namespace bellatrix.Services
         public async Task<List<Order>> GetAsync() =>
             await _orders.Find(order => true).ToListAsync();
 
-        public async Task<List<Order>> SearchAsync(string searchParam)
+        public async Task<(List<Order>, long)> SearchAsync(string searchParam, int page)
         {
             var filter = new BsonDocument
             {
@@ -36,9 +38,23 @@ namespace bellatrix.Services
                 }
             };
 
-            return await _orders
+            var sort = new BsonDocument
+            {
+                {
+                    "DateCreated", -1
+                }
+            };
+
+            var orders = await _orders
                 .Find(filter)
+                .Sort(sort)
+                .Skip(page*PageSize)
+                .Limit(PageSize)
                 .ToListAsync();
+
+            var pagesCount = (await _orders.Find(filter).CountDocumentsAsync() - 1) / PageSize + 1;
+
+            return (orders, pagesCount);
         }
 
         public async Task<Order> GetAsync(string id) =>
