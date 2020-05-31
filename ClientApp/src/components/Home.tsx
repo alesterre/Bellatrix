@@ -94,7 +94,7 @@ export class Home extends Component<IProps, OrdersState> {
       };
 
     return (
-      <div>
+      <Container>
         <h1>Orders</h1>
         <Row>
           <Col>
@@ -236,7 +236,7 @@ export class Home extends Component<IProps, OrdersState> {
             <Button color="secondary" onClick={ () => toggle() }>Cancel</Button>
           </ModalFooter>
         </Modal>
-      </div>
+      </Container>
     );
   }
 
