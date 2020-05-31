@@ -12,15 +12,10 @@ COPY . app/
 
 WORKDIR /app
 
-RUN ls
-
 RUN dotnet restore "bellatrix.csproj"
 RUN dotnet publish "bellatrix.csproj" -c Release -o /out
-
-RUN ls
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 COPY --from=build /out .
-RUN ls
 ENTRYPOINT ["dotnet", "bellatrix.dll"]
