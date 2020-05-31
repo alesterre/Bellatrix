@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -19,7 +16,7 @@ namespace bellatrix.Model
 
         public override string ToString()
         {
-            return $"{Id.ToString().Substring(0, 10)} - {DateCreated} - {ClientName} - {Description}: {TotalPrice:C}";
+            return $"{Id.Substring(0, 10)} - {DateCreated} - {ClientName} - {Description}: {TotalPrice:C}";
         }
     }
 }

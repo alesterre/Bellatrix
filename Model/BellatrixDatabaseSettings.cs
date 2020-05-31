@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace bellatrix.Model
+﻿namespace bellatrix.Model
 {
     public class BellatrixDatabaseSettings : IBellatrixDatabaseSettings
     {

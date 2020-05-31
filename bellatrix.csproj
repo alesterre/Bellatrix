@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Remove="ClientApp\node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="ClientApp\src\App.test.tsx" />
     <None Remove="ClientApp\src\App.tsx" />
     <None Remove="ClientApp\src\index.tsx" />
