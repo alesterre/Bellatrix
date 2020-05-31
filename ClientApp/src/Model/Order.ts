@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from "moment";
 export default class Order {
   id: string;
   dateCreated: Date;
@@ -11,7 +11,8 @@ export default class Order {
     dateCreated: Date,
     clientName: string,
     description: string,
-    totalPrice: number) {
+    totalPrice: number
+  ) {
     this.id = id;
     this.dateCreated = dateCreated;
     this.clientName = clientName;
@@ -19,15 +20,19 @@ export default class Order {
     this.totalPrice = totalPrice;
   }
 
-  dateCreatedFormatted () : string {
-    return moment(this.dateCreated).local().format('YYYY-MM-DD HH:mm:ss');
+  dateCreatedFormatted(): string {
+    return moment(this.dateCreated)
+      .local()
+      .format("YYYY-MM-DD HH:mm:ss");
   }
 
-  totalPriceFormatted () : string {
+  totalPriceFormatted(): string {
     return `$${this.totalPrice}`;
   }
 
   toString() {
-    return `${this.id} - ${this.dateCreatedFormatted()} - ${this.clientName} - ${this.description}: $${this.totalPrice}`
+    return `${this.id} - ${this.dateCreatedFormatted()} - ${
+      this.clientName
+    } - ${this.description}: $${this.totalPrice}`;
   }
 }
