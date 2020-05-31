@@ -94,9 +94,9 @@ namespace bellatrix.Services
             await _orders.DeleteManyAsync(order => true);
         }
 
-        public async Task Create10KAsync()
+        public async Task CreateManyAsync(int count)
         {
-            var randomOrders = Enumerable.Range(0, 10_000)
+            var randomOrders = Enumerable.Range(0, count)
                 .ToList()
                 .Select(i => RandomOrderGenerator.GenerateRandomOrder());
             

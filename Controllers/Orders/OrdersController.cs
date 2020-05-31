@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using bellatrix.Model;
 using bellatrix.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 
 namespace bellatrix.Controllers.Orders
@@ -74,10 +77,20 @@ namespace bellatrix.Controllers.Orders
             return Ok();
         }
 
-        [HttpPost("10k")]
-        public async Task<ActionResult> Create10K()
+        [HttpPost("generate/{count}")]
+        public async Task<ActionResult> CreateMany(int count)
         {
-            await _service.Create10KAsync();
+            if (count < 1)
+            {
+                return UnprocessableEntity("Number of orders to generate should be at least 1.");
+            }
+
+            if (count > 1_000_000)
+            {
+                return UnprocessableEntity($"{count} is too much.");
+            }
+
+            await _service.CreateManyAsync(count);
             return Ok();
         }
 

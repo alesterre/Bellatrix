@@ -190,9 +190,12 @@ export class Home extends Component<IProps, OrdersState> {
           <Button
             color="primary"
             onClick={this.onAddItem}>Add new order</Button>
+            <Button
+            color="secondary"
+            onClick={this.onAdd10Orders}>Generate 10 orders</Button>
           <Button
             color="secondary"
-            onClick={this.onAdd10kOrders}>Generate 10k orders</Button>
+            onClick={this.onAdd10kOrders}>Generate 10K orders</Button>
           <Button
             color="danger"
             onClick={this.onDeleteAllOrders}>Delete all orders</Button>
@@ -254,8 +257,13 @@ export class Home extends Component<IProps, OrdersState> {
     })
   };
 
+  onAdd10Orders = async () => {
+    await OrdersApi.createManyOrders(0);
+    await this.reloadOrders();
+  }
+
   onAdd10kOrders = async () => {
-    await OrdersApi.create10kOrders();
+    await OrdersApi.createManyOrders(10000);
     await this.reloadOrders();
   }
 
