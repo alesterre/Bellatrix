@@ -258,7 +258,7 @@ export class Home extends Component<IProps, OrdersState> {
   };
 
   onAdd10Orders = async () => {
-    await OrdersApi.createManyOrders(0);
+    await OrdersApi.createManyOrders(10);
     await this.reloadOrders();
   }
 
